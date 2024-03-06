@@ -9,7 +9,7 @@ class ConnectFrame:
         self.__root = root
 
         self.__connect_frame = tk.Frame(self.__root)
-        self.__connect_frame.grid(row=0, column=0)
+        self.__connect_frame.grid(row=1, column=0)
 
         self.__connect_frame.columnconfigure(0, weight=1)
         self.__connect_frame.columnconfigure(1, weight=1)
