@@ -1,6 +1,6 @@
 import tkinter as tk
 
-# TODO: Add functionality to button
+# TODO: Add functionality to buttons
 
 
 class ConnectFrame:
@@ -9,7 +9,7 @@ class ConnectFrame:
         self.__root = root
 
         self.__connect_frame = tk.Frame(self.__root)
-        self.__connect_frame.grid(row=1, column=0)
+        self.__connect_frame.grid(row=1,sticky=tk.E+tk.W,padx=5,pady=5)
 
         self.__connect_frame.columnconfigure(0, weight=1)
         self.__connect_frame.columnconfigure(1, weight=1)
@@ -24,17 +24,18 @@ class ConnectFrame:
             width=25,
             font=("Ariel", 8),
         )
-        self.__label.grid(row=0, column=0, sticky=tk.W + tk.E, padx=5, pady=0)
+        
+        self.__label.grid(row=0, column=0, sticky=tk.E+tk.W, padx=5, pady=0)
 
         self.__text_box = tk.Text(
             self.__connect_frame, height=1, width=25, font=("Ariel", 8)
         )
-        self.__text_box.grid(row=1, column=0, sticky=tk.W + tk.E, padx=5, pady=5)
+        self.__text_box.grid(row=1, column=0, sticky=tk.E+tk.W, padx=5, pady=5)
 
         self.__button = tk.Button(
             self.__connect_frame, text="connect", font=("Ariel", 8)
         )
-        self.__button.grid(row=1, column=1, sticky=tk.W + tk.E, padx=5, pady=5)
+        self.__button.grid(row=1, column=1, sticky=tk.E+tk.W, padx=5, pady=5)
 
     @property
     def text(self) -> str | bool:
