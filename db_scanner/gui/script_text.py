@@ -1,8 +1,5 @@
 import tkinter as tk
 from itertools import cycle
-from numba import jit
-from threading import Thread,Lock
-from os import cpu_count
 import string
 
 class KeyWords(type):
