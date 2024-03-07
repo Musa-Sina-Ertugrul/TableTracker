@@ -1,12 +1,6 @@
 import tkinter as tk
 
 
-class QuickFunctionTable:
-
-    def __init__(self, root) -> None:
-        self.__root = root
-
-
 class MenuBarTable:
 
     def __init__(self, root) -> None:
@@ -14,8 +8,9 @@ class MenuBarTable:
         self.__root = root
 
         self.__menu_bar = tk.Menu(self.__root)
-        self.__menu_bar_quickly = tk.Menu(self.__menu_bar, tearoff=0)
 
+        # Quick Functualities TODO: Add functualities
+        self.__menu_bar_quickly = tk.Menu(self.__menu_bar, tearoff=0)
         self.__menu_bar_quickly.add_command(label="1", command=exit)
         self.__menu_bar_quickly.add_command(label="2", command=exit)
         self.__menu_bar_quickly.add_command(label="3", command=exit)
