@@ -25,3 +25,11 @@ conda activate DBScanner
 ```console
 pip install -r requirements.txt
 ```
+
+<h3 align="center">Reformatting</h3>
+
+> For reformatting use <b><i>black</i></b>. It reformat for pep8 as same as pylint but better !!!
+
+```console
+black .
+```
