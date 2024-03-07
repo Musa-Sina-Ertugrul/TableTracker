@@ -33,3 +33,11 @@ pip install -r requirements.txt
 ```console
 black .
 ```
+
+<h3 align="center">Run App</h3>
+
+> For running app
+
+```console
+python db_scanner
+```
