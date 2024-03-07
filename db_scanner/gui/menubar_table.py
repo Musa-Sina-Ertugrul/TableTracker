@@ -2,9 +2,7 @@ import tkinter as tk
 
 
 class MenuBarTable:
-
     def __init__(self, root) -> None:
-
         self.__root = root
 
         self.__menu_bar = tk.Menu(self.__root)

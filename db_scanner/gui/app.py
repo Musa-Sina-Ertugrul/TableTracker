@@ -6,7 +6,6 @@ import tkinter as tk
 
 
 class App:
-
     def __init__(self) -> None:
         self.__root = tk.Tk()
         self.__root.geometry("800x800")

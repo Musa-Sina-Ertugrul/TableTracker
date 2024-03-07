@@ -2,9 +2,9 @@ import tkinter as tk
 from itertools import cycle
 import string
 
+
 class KeyWords(type):
-    
-    keywords : set = {
+    keywords: set = {
         "ABORT",
         "ACTION",
         "ADD",
@@ -151,62 +151,59 @@ class KeyWords(type):
         "WHERE",
         "WINDOW",
         "WITH",
-        "WITHOUT"
+        "WITHOUT",
     }
-    
+
     @classmethod
-    def __prepare__(mcls,name,base):
-        cls_dict : dict = super().__prepare__(mcls,name,base)
-        keywords : dict = dict()
+    def __prepare__(mcls, name, base):
+        cls_dict: dict = super().__prepare__(mcls, name, base)
+        keywords: dict = dict()
 
-        for keyword,color in zip(mcls.keywords,cycle(("magenta4",))):
-            keywords[keyword]=color
+        for keyword, color in zip(mcls.keywords, cycle(("magenta4",))):
+            keywords[keyword] = color
 
-        for punctuation, color in zip(string.punctuation,cycle(("steel blue",))):
+        for punctuation, color in zip(string.punctuation, cycle(("steel blue",))):
             keywords[punctuation] = color
 
-        for number,color in zip(range(10),cycle(("blue4",))):
+        for number, color in zip(range(10), cycle(("blue4",))):
             keywords[str(number)] = color
 
         keywords[";"] = "gray26"
 
         cls_dict["keywords"] = keywords
         return cls_dict
-    
-    def __new__(mcls,name,bases,namespace):
-        return super().__new__(mcls,name,bases,namespace)     
+
+    def __new__(mcls, name, bases, namespace):
+        return super().__new__(mcls, name, bases, namespace)
+
 
 class ScriptText(metaclass=KeyWords):
-    
-    def __init__(self,root) -> None:
+    def __init__(self, root) -> None:
         self.__root = root
         self.__text_box = tk.Text(self.__root, font=("Ariel", 12), wrap="word")
-        self.__text_box.grid(padx=5,pady=5)
-        self.__text_box.bind("<KeyPress>",self.__coloring_words)
-        
+        self.__text_box.grid(padx=5, pady=5)
+        self.__text_box.bind("<KeyPress>", self.__coloring_words)
+
     @property
     def _text_box(self):
         return self.__text_box
-    
+
     @property
     def text(self) -> str:
-        return self._text_box.get("1.0",tk.END)
+        return self._text_box.get("1.0", tk.END)
 
-    def __coloring_words(self,event):
-        
+    def __coloring_words(self, event):
         for word in self.keywords:
-            
-            start_index : str = "1.0"
-            
+            start_index: str = "1.0"
+
             while True:
-                start_index = self._text_box.search(word.casefold(),start_index,stopindex=tk.END)
+                start_index = self._text_box.search(
+                    word.casefold(), start_index, stopindex=tk.END
+                )
                 if not bool(start_index):
                     break
-                
-                end_index : str = f"{start_index}+{len(word)}c"
-                self._text_box.tag_add(word,start_index,end_index)
-                self._text_box.tag_config(word,foreground=self.keywords[word])
+
+                end_index: str = f"{start_index}+{len(word)}c"
+                self._text_box.tag_add(word, start_index, end_index)
+                self._text_box.tag_config(word, foreground=self.keywords[word])
                 start_index = end_index
-                
-            
-            

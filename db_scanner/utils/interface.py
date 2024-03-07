@@ -1,3 +1,2 @@
 class interface(type):
-
     pass
