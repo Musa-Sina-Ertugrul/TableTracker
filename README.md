@@ -41,3 +41,9 @@ black .
 ```console
 python db_scanner
 ```
+
+> For running pylint
+
+```console
+pylint ./db_scanner/ ./test/
+```
