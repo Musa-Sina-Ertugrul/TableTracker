@@ -2,7 +2,6 @@ import tkinter as tk
 from itertools import cycle
 import string
 
-
 class KeyWords(type):
     keywords: set = {
         "ABORT",
@@ -170,7 +169,8 @@ class KeyWords(type):
 
         keywords[";"] = "gray26"
 
-        cls_dict["keywords"] = keywords
+        cls_dict["keywords_dict"] = keywords
+        cls_dict["keywords_set"] = mcls.keywords
         return cls_dict
 
     def __new__(mcls, name, bases, namespace):
@@ -193,7 +193,7 @@ class ScriptText(metaclass=KeyWords):
         return self._text_box.get("1.0", tk.END)
 
     def __coloring_words(self, event):
-        for word in self.keywords:
+        for word in self.keywords_dict:
             start_index: str = "1.0"
 
             while True:
@@ -204,6 +204,16 @@ class ScriptText(metaclass=KeyWords):
                     break
 
                 end_index: str = f"{start_index}+{len(word)}c"
-                self._text_box.tag_add(word, start_index, end_index)
-                self._text_box.tag_config(word, foreground=self.keywords[word])
+
+                if self.__is_keyword(start_index=start_index,word=word,end_index=end_index):
+                    self._text_box.tag_add(word, start_index, end_index)
+                    self._text_box.tag_config(word, foreground=self.keywords_dict[word])
                 start_index = end_index
+
+    def __is_keyword(self,start_index : str = "1.0",word:str=False,end_index : str = tk.END) -> bool:
+        post_letters: str = self._text_box.get(end_index,f"{start_index}+{len(word)+1}c")
+        if start_index != "1.0":
+            pre_word_index : str = f"{start_index}-{1}c"
+            pre_letters: str = self._text_box.get(pre_word_index,start_index)
+            return bool(set(pre_letters)-set(string.ascii_letters)) and " " in post_letters
+        return " " in post_letters
