@@ -42,7 +42,9 @@ black .
 python db_scanner
 ```
 
-> For running pylint
+<h3 align="center">Linting</h3>
+
+> For running <b><i>pylint</i></b>
 
 ```console
 pylint ./db_scanner/ ./test/
