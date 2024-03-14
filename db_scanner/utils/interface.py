@@ -10,6 +10,6 @@ class Interface(type):
             if type(value) is not str:
                 raise TypeError("Wrong interface arfument")
             elif not hasattr(bases,value):
-                raise NotImplementedError(f"{value} not implemented in {name} class")
+                raise NotImplementedError(f"{value} not implemented in {name.__class__.__name__} class")
         
         return super().__new__(mcls, name, bases, namespace)
