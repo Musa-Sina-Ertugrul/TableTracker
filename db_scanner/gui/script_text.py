@@ -5,8 +5,23 @@ import string
 class ScriptText(metaclass=SQLKeyWords):
     def __init__(self, root) -> None:
         self.__root = root
+        self.__button_frame = tk.Frame(self.__root)
+        
+
+        self.__button_frame.columnconfigure(0, weight=1)
+        self.__button_frame.columnconfigure(1, weight=1)
+
+        self.__button_frame.rowconfigure(0, weight=1)
+        
+        self.__ai_sending_button = tk.Button(self.__button_frame,text="Send to AI",font=("Ariel", 8))
+        self.__sql_sending_button = tk.Button(self.__button_frame,text="Send to DB",font=("Ariel", 8))
+
         self.__text_box = tk.Text(self.__root, font=("Ariel", 12), wrap="word")
         self.__text_box.grid(padx=5, pady=5)
+        self.__button_frame.grid(sticky=tk.E + tk.W, padx=5, pady=5)
+        self.__sql_sending_button.grid(sticky=tk.E + tk.W,row=0,column=0,padx=5,pady=5)
+        self.__ai_sending_button.grid(sticky=tk.E + tk.W,row=0,column=1,padx=5,pady=5)
+
         self.__text_box.bind("<KeyPress>", self._coloring_words)
 
     @property
