@@ -1,4 +1,4 @@
-<h1 align="center"> DBScanner</h1>
+<h1 align="center"> TableTracker</h1>
 
 <p align="center">
 <img src="https://github.com/Musa-Sina-Ertugrul/DBScanner/assets/102359522/1ea4b501-898f-4b57-8a7e-90e853d50cdd">
@@ -48,4 +48,12 @@ python db_scanner
 
 ```console
 pylint ./db_scanner/ ./test/
+```
+
+<h3 align="center">Testing</h3>
+
+> For running <b><i>unittest</i></b>
+
+```console
+python -m unittest discover
 ```
