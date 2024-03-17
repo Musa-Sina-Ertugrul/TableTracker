@@ -49,3 +49,11 @@ python db_scanner
 ```console
 pylint ./db_scanner/ ./test/
 ```
+
+<h3 align="center">Testing</h3>
+
+> For running <b><i>unittest</i></b>
+
+```console
+python -m unittest discover
+```
