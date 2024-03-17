@@ -33,3 +33,19 @@ pip install -r requirements.txt
 ```console
 black .
 ```
+
+<h3 align="center">Run App</h3>
+
+> For running app
+
+```console
+python db_scanner
+```
+
+<h3 align="center">Linting</h3>
+
+> For running <b><i>pylint</i></b>
+
+```console
+pylint ./db_scanner/ ./test/
+```
