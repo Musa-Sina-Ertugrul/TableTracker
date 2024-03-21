@@ -1,4 +1,8 @@
-from utils.sql_keywords import SQLKeyWords
+import sys
+
+sys.path.append(".")
+
+from db_scanner.utils.sql_keywords import SQLKeyWords
 import tkinter as tk
 import string
 
