@@ -1,12 +1,15 @@
 import tkinterDnD
 import tkinter.messagebox
 import customtkinter
+import string
+
+from ..utils import SQLKeyWords
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
 
-class App(customtkinter.CTk):
+class App(customtkinter.CTk,metaclass=SQLKeyWords):
     def __init__(self):
         super().__init__()
 
@@ -49,6 +52,7 @@ class App(customtkinter.CTk):
 
         # create textbox
         self.textbox = customtkinter.CTkTextbox(self, width=425)
+        self.textbox.bind("<KeyPress>",self.__coloring_words_action)
         self.textbox.grid(row=1, column=1,rowspan=3, padx=(20, 0), pady=(20, 0), sticky="nsew")
 
         self.output_label = customtkinter.CTkLabel(self, width=425)
@@ -75,6 +79,30 @@ class App(customtkinter.CTk):
     def sidebar_button_event(self):
         print("sidebar_button click")
 
+    def __coloring_words_action(self,word:str,start_index : str = "1.0") -> None:
+        while True:
+            start_index = self.textbox.search(
+                word, start_index, stopindex=customtkinter.END
+            )
+
+            if not bool(start_index):
+                break
+
+            end_index: str = f"{start_index}+{len(word)}c"
+            
+            if self.__is_keyword(start_index=start_index,word=word,end_index=end_index):
+                self.textbox.tag_add(word, start_index, end_index)
+                self.textbox.tag_config(word, foreground=self.keywords_dict[word])
+            start_index = end_index
+    
+
+    def __is_keyword(self,start_index : str = "0.0",word:str="",end_index : str = customtkinter.END) -> bool:
+        post_letters: str = self.textbox.get(end_index,f"{start_index}+{len(word)+1}c")
+        if start_index != "1.0":
+            pre_word_index : str = f"{start_index}-{1}c"
+            pre_letters: str = self.textbox.get(pre_word_index,start_index)
+            return bool(set(pre_letters)-set(string.ascii_letters)) and " " in post_letters
+        return " " in post_letters
 
 if __name__ == "__main__":
     app = App()
