@@ -35,8 +35,8 @@ class App(customtkinter.CTk,metaclass=SQLKeyWords):
         self.sidebar_frame.grid_rowconfigure(5, weight=1)
         self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="TableTracker", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.quick_label = customtkinter.CTkLabel(self.sidebar_frame, text="QuickTable", font=customtkinter.CTkFont(size=20, weight="bold"))
-        self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
-        self.quick_label.grid(row=1,column=0,padx=20, pady=(20, 0))
+        self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 0))
+        self.quick_label.grid(row=1,column=0,padx=20, pady=(10, 0))
         self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, command=self.sidebar_button_event)
         self.sidebar_button_1.grid(row=2, column=0, padx=20, pady=10)
         self.sidebar_button_2 = customtkinter.CTkButton(self.sidebar_frame, command=self.sidebar_button_event)
@@ -47,7 +47,7 @@ class App(customtkinter.CTk,metaclass=SQLKeyWords):
         self.appearance_mode_label.grid(row=6, column=0, padx=20, pady=(10, 0))
         self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["Light", "Dark", "System"],
                                                                        command=self.change_appearance_mode_event)
-        self.appearance_mode_optionemenu.grid(row=7, column=0, padx=20, pady=(10, 10))
+        self.appearance_mode_optionemenu.grid(row=7, column=0, padx=20, pady=(10, 0))
         self.scaling_label = customtkinter.CTkLabel(self.sidebar_frame, text="UI Scaling:", anchor="w")
         self.scaling_label.grid(row=8, column=0, padx=20, pady=(10, 0))
         self.scaling_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["80%", "90%", "100%", "110%", "120%"],
@@ -55,7 +55,7 @@ class App(customtkinter.CTk,metaclass=SQLKeyWords):
         
         self.scaling_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["80%", "90%", "100%", "110%", "120%"],
                                                                command=self.change_scaling_event)
-        self.scaling_optionemenu.grid(row=9, column=0, padx=20, pady=(10, 20))
+        self.scaling_optionemenu.grid(row=9, column=0, padx=20, pady=(10, 0))
 
         self.syntax_error_label = customtkinter.CTkLabel(self.sidebar_frame, text="Syntax Error", anchor="w")
         self.syntax_error_label.grid(row=10, column=0, padx=20, pady=(10, 0))
@@ -72,14 +72,16 @@ class App(customtkinter.CTk,metaclass=SQLKeyWords):
         self.textbox.bind("<space>",self._analyze_text)
         self.textbox.grid(row=1, column=1,rowspan=3, padx=(20, 0), pady=(20, 0), sticky="nsew")
 
-        self.output_label = customtkinter.CTkLabel(self, width=425)
-        self.output_label.grid(row=1, column=2,rowspan=3,columnspan=2, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        self.output_frame = customtkinter.CTkScrollableFrame(self, width=425)
+        self.output_label = customtkinter.CTkLabel(self.output_frame, width=425)
+        self.output_label.grid(sticky="nsew")
+        self.output_frame.grid(row=1, column=2,rowspan=3,columnspan=2, padx=(20, 20), pady=(20, 0), sticky="nsew")
 
         self.enter_db = customtkinter.CTkEntry(self,placeholder_text="Enter DB")
         self.enter_db.grid(row=0, column=1, padx=(20, 0), pady=(20, 0), sticky="nsew")
 
         self.enter_db_button = customtkinter.CTkButton(master=self,text="Enter DB", fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"))
-        self.enter_db_button.grid(row=0, column=2,columnspan=2, padx=(20, 20), pady=(20, 20), sticky="nsew")
+        self.enter_db_button.grid(row=0, column=2,columnspan=2, padx=(20, 20), pady=(20, 0), sticky="nsew")
 
         # set default values
         self.appearance_mode_optionemenu.set("System")
@@ -109,7 +111,6 @@ class App(customtkinter.CTk,metaclass=SQLKeyWords):
         self.textbox.delete("1.0",customtkinter.END)
         textbox_text += " "
         self.textbox.insert("1.0",textbox_text)
-        print(self.get_textbox_text)
 
     def _add_syntax_error_sign(self):
         self._last_syntax_error_index : int = (len(self.get_textbox_text.strip("\n")) - self.PASS_UNNECASSARY_LAST_LETTERS 
