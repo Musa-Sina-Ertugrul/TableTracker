@@ -1,4 +1,4 @@
-from db_scanner.utils.interface import Interface
+from table_tracker.utils.interface import Interface
 import unittest
 
 # TODO: Add docstring
