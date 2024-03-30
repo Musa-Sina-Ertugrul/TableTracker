@@ -2,6 +2,7 @@ import sqlite3
 from itertools import tee
 from functools import cache, reduce
 from sys import getsizeof
+import math
 from psutil import virtual_memory
 import customtkinter
 from .event_handler import EventHandler
@@ -10,6 +11,8 @@ from ..utils import QUERY_ERROR_NONE_OBJECT
 
 
 class SQLEventHandler(metaclass=EventHandler):
+
+    MAX_PAGE_COUNT : int = 10
 
     def __init__(self, textbox : customtkinter.CTkTextbox,cursor:sqlite3.Cursor,result_label:customtkinter.CTkLabel) -> None:
         self._textbox : customtkinter.CTkTextbox = textbox
@@ -70,7 +73,7 @@ class SQLEventHandler(metaclass=EventHandler):
         len(self)
         avaible_memory : int = int(virtual_memory()[1])
 
-        page_count : int = ( self.__total_size // (avaible_memory / 4.0)) or 1
+        page_count : int = min(math.ceil( self.__total_size // (avaible_memory / 4.0)),self.MAX_PAGE_COUNT)
         row_count : int = self.__total_size // page_count
 
         itrs : sqlite3.Cursor = tee(self.get_query_result_itr,page_count)
