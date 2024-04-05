@@ -10,32 +10,29 @@ from ..utils import QUERY_ERROR_NONE_OBJECT
 
 
 
-class SQLEventHandler(metaclass=EventHandler):
+class SQLEventHandler(EventHandler):
 
     MAX_PAGE_COUNT : int = 10
 
-    def __init__(self, textbox : customtkinter.CTkTextbox,cursor:sqlite3.Cursor,result_label:customtkinter.CTkLabel) -> None:
-        self._textbox : customtkinter.CTkTextbox = textbox
+    def __init__(self, query : str,cursor:sqlite3.Cursor,result_label:customtkinter.CTkLabel) -> None:
+        self._query : str = query
         self._cursor : sqlite3.Cursor = cursor
         self._result_label : customtkinter.CTkLabel = result_label
         self.__col_len : int = 0
         self.__row_len : int = 0
         self.__total_size : int = 0
-
-    @property
-    def get_query(self) -> str:
-        return self._textbox.get("1.0","end")
     
     @property
-    def get_formatted_text(self):
-        # TODO: Implement This
-        return ""
+    def get_query(self) -> str:
+        if not sqlite3.complete_statement(self._query):
+            return QUERY_ERROR_NONE_OBJECT
+        return self._query
     
     @property
     def get_query_result_itr(self) -> sqlite3.Cursor | None:
         try:
             return self._cursor.execute(self.get_query)
-        except sqlite3.ProgrammingError:
+        except (sqlite3.ProgrammingError,AttributeError):
             self._cursor.close()
             return QUERY_ERROR_NONE_OBJECT
 
@@ -69,6 +66,7 @@ class SQLEventHandler(metaclass=EventHandler):
         return self.__col_len
     
     @property
+    @cache
     def divaded_itrs(self) -> tuple[sqlite3.Cursor]:
         len(self)
         avaible_memory : int = int(virtual_memory()[1])
@@ -84,6 +82,9 @@ class SQLEventHandler(metaclass=EventHandler):
                     next(itr)
         except (IndexError):
             return itrs
+    
+    def handle(self) -> tuple[sqlite3.Cursor]:
+        return self.divaded_itrs
 
         
     

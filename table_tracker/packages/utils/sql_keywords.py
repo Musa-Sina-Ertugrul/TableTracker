@@ -1,8 +1,8 @@
-import tkinter as tk
 from itertools import cycle
 import string
+from abc import ABCMeta
 
-class SQLKeyWords(type):
+class SQLKeyWords(ABCMeta):
     keywords: set = {
         "ABORT",
         "ACTION",
