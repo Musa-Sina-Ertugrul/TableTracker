@@ -39,7 +39,7 @@ class FormatTextHandler(EventHandler):
                 line_text += f"{str(attr):>{self._max_len}}"
             yield line_text + "\n"
 
-    def handle(self, page_name: str = "Page 1"):
+    def handle(self, page_name: str = "Page 1") -> None:
         if self._isfirst:
             self._handle_first_call()
             return
@@ -54,7 +54,7 @@ class FormatTextHandler(EventHandler):
         except TypeError:
             self._root.set_result_label = "Query executed"
 
-    def _handle_first_call(self):
+    def _handle_first_call(self) -> None:
 
         try:
             itrs: tuple[sqlite3.Cursor] = self._itrs
@@ -70,7 +70,7 @@ class FormatTextHandler(EventHandler):
             self._isfirst = False
             self._root.set_result_label = "Query executed"
 
-    def _change_text(self, itr: sqlite3.Cursor):
+    def _change_text(self, itr: sqlite3.Cursor) -> None:
 
         label_text: str = "\n"
         for column in self._sql_handler._cursor.description:

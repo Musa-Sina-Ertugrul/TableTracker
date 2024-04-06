@@ -1,5 +1,8 @@
-def check_methods(subcls, *methods):
-    mro = subcls.__mro__
+from typing import Literal
+
+
+def check_methods(subcls, *methods) -> Literal["NotImplemented"] | Literal[True]:
+    mro: dict = subcls.__mro__
     for method in methods:
         for cls in mro:
             if method in cls.__dict__:

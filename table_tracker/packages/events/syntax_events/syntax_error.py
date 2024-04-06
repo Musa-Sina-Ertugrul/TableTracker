@@ -13,7 +13,7 @@ class SytanxErrorHandler(EventHandler):
         self._last_syntax_error_index = customtkinter.END
         self.__syntax_error_highlight: bool = True
 
-    def add_syntax_error_sign(self):
+    def add_syntax_error_sign(self) -> None:
         self._last_syntax_error_index = (
             len(self._root.get_textbox_text.strip("\n"))
             - self.PASS_UNNECASSARY_LAST_LETTERS
@@ -30,10 +30,10 @@ class SytanxErrorHandler(EventHandler):
             self.__SYNTAX_ERROR_TAG_NAME, underline=True, underlinefg="red"
         )
 
-    def change_syntax_on_off(self, curren_state: str):
+    def change_syntax_on_off(self, curren_state: str) -> None:
         self.__syntax_error_highlight = self.ON_OFF[curren_state]
 
-    def handle(self):
+    def handle(self) -> None:
         if self.__syntax_error_highlight:
             if not sqlite3.complete_statement(self._root.get_textbox_text):
                 self.add_syntax_error_sign()

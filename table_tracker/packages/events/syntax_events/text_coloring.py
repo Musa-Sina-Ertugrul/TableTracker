@@ -10,7 +10,7 @@ class TextColoringHandler(EventHandler, metaclass=SQLKeyWords):
 
         self._root: "App" = root
 
-    def handle(self):
+    def handle(self) -> None:
 
         for word in self.keywords_dict:
             self.__coloring_words(word=word)
