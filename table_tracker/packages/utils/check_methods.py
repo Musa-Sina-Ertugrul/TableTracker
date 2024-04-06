@@ -1,4 +1,3 @@
-
 def check_methods(subcls, *methods):
     mro = subcls.__mro__
     for method in methods:

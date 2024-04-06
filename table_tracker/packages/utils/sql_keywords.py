@@ -2,6 +2,7 @@ from itertools import cycle
 import string
 from abc import ABCMeta
 
+
 class SQLKeyWords(ABCMeta):
     keywords: set = {
         "ABORT",
