@@ -1,5 +1,5 @@
 import sqlite3
-from itertools import tee
+from typing import Self
 from functools import cache, reduce
 from sys import getsizeof
 import math
@@ -8,19 +8,22 @@ import customtkinter
 from .event_handler import EventHandler
 from ..utils import QUERY_ERROR_NONE_OBJECT
 
-
-
 class SQLEventHandler(EventHandler):
 
     MAX_PAGE_COUNT : int = 10
 
+    @cache
+    def __new__(cls,*args,**kwargs) -> Self:
+        return super().__new__(cls)
+
     def __init__(self, query : str,cursor:sqlite3.Cursor,result_label:customtkinter.CTkLabel) -> None:
-        self._query : str = query
-        self._cursor : sqlite3.Cursor = cursor
-        self._result_label : customtkinter.CTkLabel = result_label
-        self.__col_len : int = 0
-        self.__row_len : int = 0
-        self.__total_size : int = 0
+        if not hasattr(self,"_query"):
+            self._query : str = query
+            self._cursor : sqlite3.Cursor = cursor
+            self._result_label : customtkinter.CTkLabel = result_label
+            self.__col_len : int = 0
+            self.__row_len : int = 0
+            self.__total_size : int = 0
     
     @property
     def get_query(self) -> str:
@@ -32,13 +35,12 @@ class SQLEventHandler(EventHandler):
     def get_query_result_itr(self) -> sqlite3.Cursor | None:
         try:
             return self._cursor.execute(self.get_query)
-        except (sqlite3.ProgrammingError,AttributeError):
-            self._cursor.close()
+        except (sqlite3.ProgrammingError,AttributeError) as error:
             return QUERY_ERROR_NONE_OBJECT
 
     @staticmethod
     def _sizeof_row(row : list[tuple]) -> int:
-        return reduce(getsizeof,( str(*atr) for atr in row))
+        return reduce(getsizeof,[str(atr) for atr in row])
     
     @property
     def row_len(self) -> int:
@@ -56,8 +58,7 @@ class SQLEventHandler(EventHandler):
                 self.__total_size += self._sizeof_row(row)
             self.__row_len = row_count+1
             return self.__row_len
-        except (sqlite3.ProgrammingError,StopIteration,TypeError):
-            self._cursor.close()
+        except (sqlite3.ProgrammingError,StopIteration,TypeError) as error:
             return 0
     
     @property
@@ -66,15 +67,17 @@ class SQLEventHandler(EventHandler):
         return self.__col_len
     
     @property
-    @cache
     def divaded_itrs(self) -> tuple[sqlite3.Cursor]:
         len(self)
         avaible_memory : int = int(virtual_memory()[1])
 
-        page_count : int = min(math.ceil( self.__total_size // (avaible_memory / 4.0)),self.MAX_PAGE_COUNT)
+        page_count : int = max(min(math.ceil( self.__total_size // (avaible_memory / 4.0)),self.MAX_PAGE_COUNT),1)
         row_count : int = self.__total_size // page_count
 
-        itrs : sqlite3.Cursor = tee(self.get_query_result_itr,page_count)
+        try:
+            itrs : sqlite3.Cursor = [self.get_query_result_itr for _ in range(page_count)]
+        except TypeError:
+            return QUERY_ERROR_NONE_OBJECT
 
         try:
             for current_page,itr in enumerate(itrs[1:],1):
@@ -82,6 +85,8 @@ class SQLEventHandler(EventHandler):
                     next(itr)
         except (IndexError):
             return itrs
+
+        return itrs
     
     def handle(self) -> tuple[sqlite3.Cursor]:
         return self.divaded_itrs
