@@ -4,7 +4,7 @@ import string
 import sqlite3
 import sys
 import os
-
+from sql_formatter.core import format_sql
 from ..utils import SQLKeyWords
 from packages.events.syntax_events import SytanxErrorHandler
 from packages.events.syntax_events import TextColoringHandler
@@ -59,11 +59,11 @@ class App(customtkinter.CTk):
         )
         self.sidebar_button_1.grid(row=2, column=0, padx=20, pady=10)
         self.sidebar_button_2 = customtkinter.CTkButton(
-            self.sidebar_frame, command=self.sidebar_button_event
+            self.sidebar_frame, text="Table Names", command=self.get_table_names
         )
         self.sidebar_button_2.grid(row=3, column=0, padx=20, pady=10)
         self.sidebar_button_3 = customtkinter.CTkButton(
-            self.sidebar_frame, command=self.sidebar_button_event
+            self.sidebar_frame, text="Formatting", command=self.format_sql_query
         )
         self.sidebar_button_3.grid(row=4, column=0, padx=20, pady=10)
         self.appearance_mode_label = customtkinter.CTkLabel(
@@ -167,16 +167,24 @@ class App(customtkinter.CTk):
     def change_appearance_mode_event(self, new_appearance_mode: str):
         customtkinter.set_appearance_mode(new_appearance_mode)
 
-    def change_scaling_event(self, new_scaling: str):
+    def change_scaling_event(self, new_scaling: str) -> None:
         new_scaling_float = int(new_scaling.replace("%", "")) / 100
         customtkinter.set_widget_scaling(new_scaling_float)
 
-    def change_output_page(self, page_name: str):
+    def change_output_page(self, page_name: str) -> None:
 
         if self._format_event is not None:
             self._format_event.handle(page_name)
 
-    def get_table_names(self):
+    def format_sql_query(self) -> None:
+        formatted_sql: str = format_sql(
+            self.get_textbox_text, semicolon=True, max_len=1000000000
+        )
+        self.textbox.delete("1.0", customtkinter.END)
+        self.textbox.insert("1.0", formatted_sql)
+        self._add_final_space()
+
+    def get_table_names(self) -> None:
 
         if self._main_connection is not None:
             query: str = (
@@ -191,13 +199,10 @@ class App(customtkinter.CTk):
         else:
             self.set_result_label = "As first connect db"
 
-    def close_connection(self):
+    def close_connection(self) -> None:
         if self._main_connection is not None:
             self._main_connection.close()
         self.set_result_label = "Connection closed"
-
-    def sidebar_button_event(self):
-        print("sidebar_button click")
 
     @property
     def get_textbox_text(self) -> str:
@@ -217,7 +222,7 @@ class App(customtkinter.CTk):
         return self.output_label
 
     @_output_label.setter
-    def set_result_label(self, text: str):
+    def set_result_label(self, text: str) -> None:
         self.output_label.configure(text=text.strip().strip("\n").strip("\t"))
 
     def _check_db_file_ishere(self) -> bool:
@@ -229,7 +234,7 @@ class App(customtkinter.CTk):
             return False
         return True
 
-    def _connect_db(self):
+    def _connect_db(self) -> None:
         if ".db" == self.get_db_name[-3:]:
             self._check_db_file_ishere()
             try:
@@ -245,7 +250,7 @@ class App(customtkinter.CTk):
         else:
             self.set_result_label = f"Wrong db name : {self.get_db_name}"
 
-    def _create_sql_event(self):
+    def _create_sql_event(self) -> None:
         if self._main_cursor is None:
             self.set_result_label = "As first connect db"
             return
@@ -261,7 +266,7 @@ class App(customtkinter.CTk):
         self.format_event.handle()
         self._main_connection.commit()
 
-    def _add_final_space(self):
+    def _add_final_space(self) -> None:
         textbox_text: str = self.get_textbox_text
         self.textbox.delete("1.0", customtkinter.END)
         textbox_text += " "
