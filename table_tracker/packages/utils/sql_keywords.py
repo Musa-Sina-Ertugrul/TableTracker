@@ -1,8 +1,10 @@
-import tkinter as tk
 from itertools import cycle
+from typing import Any, Self
 import string
+from abc import ABCMeta
 
-class SQLKeyWords(type):
+
+class SQLKeyWords(ABCMeta):
     keywords: set = {
         "ABORT",
         "ACTION",
@@ -154,7 +156,7 @@ class SQLKeyWords(type):
     }
 
     @classmethod
-    def __prepare__(mcls, name, base):
+    def __prepare__(mcls, name, base) -> Any | dict:
         cls_dict: dict = super().__prepare__(mcls, name, base)
         keywords: dict = dict()
 
@@ -173,5 +175,5 @@ class SQLKeyWords(type):
         cls_dict["keywords_set"] = mcls.keywords
         return cls_dict
 
-    def __new__(mcls, name, bases, namespace):
+    def __new__(mcls, name, bases, namespace) -> Self:
         return super().__new__(mcls, name, bases, namespace)

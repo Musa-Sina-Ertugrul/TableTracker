@@ -62,5 +62,5 @@ pylint ./db_scanner/ ./test/
 > For running <b><i>unittest</i></b>
 
 ```console
-python -m unittest discover
+python -m unittest discover -v
 ```
