@@ -1,6 +1,7 @@
 import sqlite3
 from typing import Self
 from functools import cache, reduce
+from sql_formatter.core import format_sql
 from sys import getsizeof
 import math
 from psutil import virtual_memory
@@ -12,6 +13,8 @@ from ..utils import QUERY_ERROR_NONE_OBJECT
 class SQLEventHandler(EventHandler):
 
     MAX_PAGE_COUNT: int = 10
+    queries: list[str] = []
+    query_index: int = 0
 
     @cache
     def __new__(cls, *args, **kwargs) -> Self:
@@ -27,6 +30,8 @@ class SQLEventHandler(EventHandler):
             self.__col_len: int = 0
             self.__row_len: int = 0
             self.__total_size: int = 0
+            self.queries.append(format_sql(query, max_len=1000000000))
+            self.query_index += 1
 
     @property
     def get_query(self) -> str:
