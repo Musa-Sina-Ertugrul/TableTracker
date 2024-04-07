@@ -9,6 +9,7 @@ from packages.events.syntax_events import SytanxErrorHandler
 from packages.events.syntax_events import TextColoringHandler
 from packages.events import SQLEventHandler
 from packages.events.syntax_events import FormatTextHandler
+from packages.utils import strip_triple
 
 customtkinter.set_appearance_mode(
     "System"
@@ -46,7 +47,7 @@ class App(customtkinter.CTk):
         # create sidebar frame with widgets
         self.sidebar_frame = customtkinter.CTkFrame(self, width=140, corner_radius=0)
         self.sidebar_frame.grid(row=0, column=0, rowspan=5, sticky="nsew")
-        self.sidebar_frame.grid_rowconfigure(7, weight=1)
+        self.sidebar_frame.grid_rowconfigure(8, weight=1)
         self.logo_label = customtkinter.CTkLabel(
             self.sidebar_frame,
             text="TableTracker",
@@ -94,27 +95,34 @@ class App(customtkinter.CTk):
             font=customtkinter.CTkFont(family="Courier"),
         )
         self.sidebar_button_5.grid(row=6, column=0, padx=20, pady=10)
+        self.sidebar_button_6 = customtkinter.CTkButton(
+            self.sidebar_frame,
+            text="Exit",
+            command=exit,
+            font=customtkinter.CTkFont(family="Courier"),
+        )
+        self.sidebar_button_6.grid(row=7, column=0, padx=20, pady=10)
         self.appearance_mode_label = customtkinter.CTkLabel(
             self.sidebar_frame,
             text="Appearance Mode:",
             anchor="w",
             font=customtkinter.CTkFont(family="Courier"),
         )
-        self.appearance_mode_label.grid(row=8, column=0, padx=20, pady=(10, 0))
+        self.appearance_mode_label.grid(row=9, column=0, padx=20, pady=(10, 0))
         self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(
             self.sidebar_frame,
             values=["Light", "Dark", "System"],
             command=self.change_appearance_mode_event,
             font=customtkinter.CTkFont(family="Courier"),
         )
-        self.appearance_mode_optionemenu.grid(row=9, column=0, padx=20, pady=(10, 0))
+        self.appearance_mode_optionemenu.grid(row=10, column=0, padx=20, pady=(10, 0))
         self.scaling_label = customtkinter.CTkLabel(
             self.sidebar_frame,
             text="UI Scaling:",
             anchor="w",
             font=customtkinter.CTkFont(family="Courier"),
         )
-        self.scaling_label.grid(row=10, column=0, padx=20, pady=(10, 0))
+        self.scaling_label.grid(row=11, column=0, padx=20, pady=(10, 0))
 
         self.scaling_optionemenu = customtkinter.CTkOptionMenu(
             self.sidebar_frame,
@@ -122,7 +130,7 @@ class App(customtkinter.CTk):
             command=self.change_scaling_event,
             font=customtkinter.CTkFont(family="Courier"),
         )
-        self.scaling_optionemenu.grid(row=11, column=0, padx=20, pady=(10, 0))
+        self.scaling_optionemenu.grid(row=12, column=0, padx=20, pady=(10, 0))
 
         self.syntax_error_label = customtkinter.CTkLabel(
             self.sidebar_frame,
@@ -130,7 +138,7 @@ class App(customtkinter.CTk):
             anchor="w",
             font=customtkinter.CTkFont(family="Courier"),
         )
-        self.syntax_error_label.grid(row=12, column=0, padx=20, pady=(10, 0))
+        self.syntax_error_label.grid(row=13, column=0, padx=20, pady=(10, 0))
 
         self.syntax_error_optionmenu = customtkinter.CTkOptionMenu(
             self.sidebar_frame,
@@ -138,7 +146,7 @@ class App(customtkinter.CTk):
             command=self._syntax_error_handler.change_syntax_on_off,
             font=customtkinter.CTkFont(family="Courier"),
         )
-        self.syntax_error_optionmenu.grid(row=13, column=0, padx=20, pady=(10, 20))
+        self.syntax_error_optionmenu.grid(row=14, column=0, padx=20, pady=(10, 20))
 
         self.main_button_1 = customtkinter.CTkButton(
             master=self,
@@ -285,16 +293,6 @@ class App(customtkinter.CTk):
         else:
             self.set_result_label = "You have reached the top query"
 
-    @staticmethod
-    def __strip_triple(text: str) -> str:
-        stripped_text: str = text.strip().strip("\t").strip("\n")
-        stripped_text: str = text.strip().strip("\n").strip("\t")
-        stripped_text: str = text.strip("\t").strip().strip("\n")
-        stripped_text: str = text.strip("\t").strip("\n").strip()
-        stripped_text: str = text.strip("\n").strip("\t").strip()
-        stripped_text: str = text.strip("\n").strip().strip("\t")
-        return stripped_text
-
     def get_info_from_file(self):
         files: str = filedialog.askopenfilenames(defaultextension=".")
         if not bool(files):
@@ -312,7 +310,7 @@ class App(customtkinter.CTk):
         elif file_name[-4:] == ".sql":
             with open(file_name, "r") as f:
                 self.textbox.delete("0.0", customtkinter.END)
-                self.textbox.insert("0.0", self.__strip_triple("".join(f.readlines())))
+                self.textbox.insert("0.0", strip_triple("".join(f.readlines())))
                 self._add_final_space()
                 self._text_coloring_handler.handle()
             return None
@@ -355,7 +353,7 @@ class App(customtkinter.CTk):
 
     @property
     def get_textbox_text(self) -> str:
-        return self.__strip_triple(self.textbox.get("1.0", "end"))
+        return strip_triple(self.textbox.get("1.0", "end"))
 
     def _add_page(self, *args):
         if any([type(arg) is not str for arg in args]):
@@ -364,7 +362,7 @@ class App(customtkinter.CTk):
 
     @property
     def get_db_name(self) -> str:
-        return self.__strip_triple(self.enter_db.get())
+        return strip_triple(self.enter_db.get())
 
     @property
     def _output_label(self) -> customtkinter.CTkLabel:
@@ -372,7 +370,7 @@ class App(customtkinter.CTk):
 
     @_output_label.setter
     def set_result_label(self, text: str) -> None:
-        self.output_label.configure(text=self.__strip_triple(text))
+        self.output_label.configure(text=strip_triple(text))
 
     def _check_db_file_ishere(self) -> bool:
         if self.get_db_name not in set(os.listdir(".")):

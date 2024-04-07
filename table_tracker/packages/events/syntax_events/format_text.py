@@ -4,7 +4,7 @@ import sqlite3
 from typing import Any, Generator
 from ..event_handler import EventHandler
 from ..sql_event_handler import SQLEventHandler
-from packages.utils import QUERY_ERROR_NONE_OBJECT
+from packages.utils import QUERY_ERROR_NONE_OBJECT,strip_triple
 
 
 class FormatTextHandler(EventHandler):
@@ -81,4 +81,5 @@ class FormatTextHandler(EventHandler):
         label_text += "\n\n\n"
         for line in self.get_one_line(self._sql_handler.get_query_result_itr):
             label_text += line
-        self._root.set_result_label = label_text
+        
+        self._root.set_result_label = strip_triple(label_text)
