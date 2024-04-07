@@ -1,10 +1,9 @@
-import tkinterDnD
 import customtkinter
+from customtkinter import filedialog
 import sqlite3
 import os
-import sys
-from multiprocessing import Process
 from time import sleep
+from threading import Thread
 from sql_formatter.core import format_sql
 from packages.events.syntax_events import SytanxErrorHandler
 from packages.events.syntax_events import TextColoringHandler
@@ -18,10 +17,8 @@ customtkinter.set_default_color_theme(
     "blue"
 )  # Themes: "blue" (standard), "green", "dark-blue"
 
-customtkinter.set_ctk_parent_class(tkinterDnD.Tk)
 
-
-class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
+class App(customtkinter.CTk):
 
     def __init__(self):
         super().__init__()
@@ -31,19 +28,16 @@ class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
         self._main_connection: sqlite3.Connection = None
         self._main_cursor: sqlite3.Cursor = None
         self._format_event: FormatTextHandler = None
+        self._file_path : str = ""
 
-        self.set_dropfile_tempdir("tmp_files/")
-        self.register_drag_source()
-        self.register_drop_target()
-        self.bind("<<Drop>>", self.get_info_from_file)
         self.bind("<Control-z>", self.get_older_query)
         self.bind("<Control-Shift-Z>", self.get_new_old_query)
 
         # configure window
         self.iconbitmap(default="logo.ico")
         self.title("")
-        self.geometry(f"{1100}x{580}")
-
+        self.geometry(f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}")
+        self.attributes('-fullscreen', True)
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure((2, 3), weight=1)
@@ -52,7 +46,7 @@ class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
         # create sidebar frame with widgets
         self.sidebar_frame = customtkinter.CTkFrame(self, width=140, corner_radius=0)
         self.sidebar_frame.grid(row=0, column=0, rowspan=5, sticky="nsew")
-        self.sidebar_frame.grid_rowconfigure(6, weight=1)
+        self.sidebar_frame.grid_rowconfigure(7, weight=1)
         self.logo_label = customtkinter.CTkLabel(
             self.sidebar_frame,
             text="TableTracker",
@@ -93,27 +87,34 @@ class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
             font=customtkinter.CTkFont(family="Courier"),
         )
         self.sidebar_button_4.grid(row=5, column=0, padx=20, pady=10)
+        self.sidebar_button_5 = customtkinter.CTkButton(
+            self.sidebar_frame,
+            text="Open File",
+            command=self.get_info_from_file,
+            font=customtkinter.CTkFont(family="Courier"),
+        )
+        self.sidebar_button_5.grid(row=6, column=0, padx=20, pady=10)
         self.appearance_mode_label = customtkinter.CTkLabel(
             self.sidebar_frame,
             text="Appearance Mode:",
             anchor="w",
             font=customtkinter.CTkFont(family="Courier"),
         )
-        self.appearance_mode_label.grid(row=7, column=0, padx=20, pady=(10, 0))
+        self.appearance_mode_label.grid(row=8, column=0, padx=20, pady=(10, 0))
         self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(
             self.sidebar_frame,
             values=["Light", "Dark", "System"],
             command=self.change_appearance_mode_event,
             font=customtkinter.CTkFont(family="Courier"),
         )
-        self.appearance_mode_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 0))
+        self.appearance_mode_optionemenu.grid(row=9, column=0, padx=20, pady=(10, 0))
         self.scaling_label = customtkinter.CTkLabel(
             self.sidebar_frame,
             text="UI Scaling:",
             anchor="w",
             font=customtkinter.CTkFont(family="Courier"),
         )
-        self.scaling_label.grid(row=9, column=0, padx=20, pady=(10, 0))
+        self.scaling_label.grid(row=10, column=0, padx=20, pady=(10, 0))
 
         self.scaling_optionemenu = customtkinter.CTkOptionMenu(
             self.sidebar_frame,
@@ -121,7 +122,7 @@ class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
             command=self.change_scaling_event,
             font=customtkinter.CTkFont(family="Courier"),
         )
-        self.scaling_optionemenu.grid(row=10, column=0, padx=20, pady=(10, 0))
+        self.scaling_optionemenu.grid(row=11, column=0, padx=20, pady=(10, 0))
 
         self.syntax_error_label = customtkinter.CTkLabel(
             self.sidebar_frame,
@@ -129,7 +130,7 @@ class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
             anchor="w",
             font=customtkinter.CTkFont(family="Courier"),
         )
-        self.syntax_error_label.grid(row=11, column=0, padx=20, pady=(10, 0))
+        self.syntax_error_label.grid(row=12, column=0, padx=20, pady=(10, 0))
 
         self.syntax_error_optionmenu = customtkinter.CTkOptionMenu(
             self.sidebar_frame,
@@ -137,7 +138,7 @@ class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
             command=self._syntax_error_handler.change_syntax_on_off,
             font=customtkinter.CTkFont(family="Courier"),
         )
-        self.syntax_error_optionmenu.grid(row=12, column=0, padx=20, pady=(10, 20))
+        self.syntax_error_optionmenu.grid(row=13, column=0, padx=20, pady=(10, 20))
 
         self.main_button_1 = customtkinter.CTkButton(
             master=self,
@@ -145,7 +146,7 @@ class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
             fg_color="transparent",
             border_width=2,
             text_color=("gray10", "#DCE4EE"),
-            command=self._create_sql_event,
+            command=self.create_sql_event,
             font=customtkinter.CTkFont(family="Courier"),
         )
         self.main_button_1.grid(
@@ -159,7 +160,7 @@ class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
             wrap="word",
             font=customtkinter.CTkFont(family="Courier"),
         )
-        self.textbox.bind("<space>", self._analyze_text)
+        self.textbox.bind("<Enter>", self._analyze_text)
         self.textbox.grid(
             row=1, column=1, rowspan=3, padx=(20, 0), pady=(20, 0), sticky="nsew"
         )
@@ -241,6 +242,11 @@ class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
         return current_query_file
 
     def save_query(self):
+        thread : Thread = Thread(target=self._save_query,daemon=True)
+        thread.start()
+
+    
+    def _save_query(self):
         if sqlite3.complete_statement(self.get_textbox_text):
             files: list[str] = os.listdir(".")
             current_query_file: int = self._current_saved_query(files)
@@ -262,6 +268,7 @@ class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
             )
             SQLEventHandler.query_index -= 1
             self._add_final_space()
+            self._text_coloring_handler.handle()
         else:
             self.set_result_label = "You have reached the bottom query"
 
@@ -274,6 +281,7 @@ class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
             )
             SQLEventHandler.query_index += 1
             self._add_final_space()
+            self._text_coloring_handler.handle()
         else:
             self.set_result_label = "You have reached the top query"
 
@@ -288,61 +296,42 @@ class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
         return stripped_text
 
     def get_info_from_file(self):
-        files: list[str] = os.listdir("./tmp_files/")
+        files: str = filedialog.askopenfilenames(defaultextension=".")
         if not bool(files):
             self.set_result_label = "As First Drop One File"
             return
         for current_file in files:
-            self.file_action(current_file)
+            thread : Thread = Thread(target=self.file_action,args=(current_file,),daemon=True)
+            thread.start()
 
     def file_action(self, file_name: str):
         if file_name[-4:] != ".sql" and file_name[-3:] != ".db":
             self.set_result_label = "Only .db or .sql path"
             self._delete_files([self._get_correct_path(file_name)])
-            return
+            return None
         elif file_name[-4:] == ".sql":
-            with open("./tmp_files/" + file_name, "r") as f:
+            with open(file_name, "r") as f:
                 self.textbox.delete("0.0", customtkinter.END)
                 self.textbox.insert("0.0", self.__strip_triple("".join(f.readlines())))
                 self._add_final_space()
+                self._text_coloring_handler.handle()
+            return None
         else:
             if self._main_connection is not None:
                 self.close_connection()
-            deletation_file: str = self._get_correct_path(file_name)
-            self._connect_db(file_name=deletation_file)
-            delete_file_thread: Process = Process(
-                target=self._delete_files,
-                args=([deletation_file],),
-                kwargs={"sleeping": True},
-                daemon=True,
-            )
-            delete_file_thread.start()
-
-    def _get_correct_path(self, file_path: str):
-        if sys.platform == "linux":
-            deletation_file: str = self.get_dropfile_tempdir() + "/" + file_path
-        elif sys.platform == "win32":
-            deletation_file: str = self.get_dropfile_tempdir() + "\\" + file_path
-        return deletation_file
-
-    @staticmethod
-    def _delete_files(file_paths: list[str], *, sleeping: bool = False):
-        deleted: bool = True
-        while deleted:
-            try:
-                for _ in map(os.remove, file_paths):
-                    continue
-                deleted = False
-            except (OSError, EOFError):
-                if sleeping:
-                    sleep(0.5)
-        return None
+            self._connect_db(file_name=file_name)
+            return None
 
     def format_sql_query(self) -> None:
+        thread : Thread = Thread(target=self._format_sql_query,daemon=True)
+        thread.start()
+
+    def _format_sql_query(self):
         formatted_sql: str = format_sql(self.get_textbox_text, max_len=1000000000)
         self.textbox.delete("1.0", customtkinter.END)
         self.textbox.insert("1.0", formatted_sql)
         self._add_final_space()
+        self._text_coloring_handler.handle()
 
     def get_table_names(self) -> None:
 
@@ -396,11 +385,11 @@ class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
 
     def _connect_db(self, file_name: str = "") -> None:
         file_name = self.get_db_name or file_name
+        self._file_path = file_name
         if ".db" == file_name[-3:]:
             self._check_db_file_ishere()
             try:
-                self._main_connection: sqlite3.Connection = sqlite3.connect(file_name)
-                self._main_cursor = self._main_connection.cursor()
+                self._file_path = file_name
                 self.set_result_label = "Connected to db"
             except sqlite3.Error:
                 print("connect_db error")
@@ -409,21 +398,27 @@ class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
         else:
             self.set_result_label = f"Wrong db name : {file_name}"
 
-    def _create_sql_event(self) -> None:
-        if self._main_cursor is None:
-            self.set_result_label = "As first connect db"
-            return
+    def create_sql_event(self) -> None:
+        thread : Thread = Thread(target=self._create_sql_event,daemon=True)
+        thread.start()
+    
+    def _create_sql_event(self):
+        if self._main_connection is not None:
+            sleep(0.2)
         if not sqlite3.complete_statement(self.get_textbox_text):
             self.set_result_label = (
                 f"{self.get_textbox_text}\n\n\n\nThis query is not complete"
             )
             return
+        self._main_connection = sqlite3.connect(self._file_path) 
         event: SQLEventHandler = SQLEventHandler(
-            self.get_textbox_text, self._main_cursor, self.output_label
+            self.get_textbox_text, self._main_connection.cursor(), self.output_label
         )
         self.format_event: FormatTextHandler = FormatTextHandler(self, event)
         self.format_event.handle()
         self._main_connection.commit()
+        self._main_connection.close()
+        self._main_connection = None
 
     def _add_final_space(self) -> None:
         textbox_text: str = self.get_textbox_text
@@ -432,9 +427,6 @@ class App(customtkinter.CTk, tkinterDnD.DnDWrapper):
         self.textbox.insert("1.0", textbox_text)
 
     def _analyze_text(self, event) -> None:
-
-        if self.get_textbox_text[-1] != " ":
-            self._add_final_space()
 
         self._text_coloring_handler.handle()
         self._syntax_error_handler.handle()

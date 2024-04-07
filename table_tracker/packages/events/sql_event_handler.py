@@ -44,6 +44,7 @@ class SQLEventHandler(EventHandler):
         try:
             return self._cursor.execute(self.get_query)
         except (sqlite3.ProgrammingError, AttributeError) as error:
+            print(error)
             return QUERY_ERROR_NONE_OBJECT
 
     @staticmethod

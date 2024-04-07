@@ -25,12 +25,13 @@ class FormatTextHandler(EventHandler):
 
     def get_max_len_on_page(self) -> int:
         max_len: int = 0
-        for column in self._sql_handler.get_query_result_itr:
-            max_len = max(len(str(column[0])), max_len)
-        for line in self._sql_handler.get_query_result_itr:
-            for atrr in line:
-                max_len = max(max_len, len(str(atrr)))
-        return max_len + 4
+        if self._sql_handler.get_query_result_itr is not None:
+            for column in self._sql_handler.get_query_result_itr:
+                max_len = max(len(str(column[0])), max_len)
+            for line in self._sql_handler.get_query_result_itr:
+                for atrr in line:
+                    max_len = max(max_len, len(str(atrr)))
+        return max_len + 10
 
     def get_one_line(self, itr: Iterator) -> Generator[str, Any, None]:
         for line in self._sql_handler.get_query_result_itr:
@@ -48,6 +49,7 @@ class FormatTextHandler(EventHandler):
         try:
             self._change_text(self._itrs[itr_index])
         except IndexError as error:
+            print(error)
             self._root.set_result_label = (
                 f"{self._sql_handler.get_query}\n\n\n\nThis query is wrong"
             )
@@ -63,6 +65,7 @@ class FormatTextHandler(EventHandler):
             self._change_text(itrs[0])
             self._isfirst = False
         except IndexError as error:
+            print(error)
             self._root.set_result_label = (
                 f"{self._sql_handler.get_query}\n\n\n\nThis query is wrong"
             )
