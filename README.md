@@ -55,8 +55,8 @@ python table_tracker
 ```
 
 > .When the application starts, you can create a new SQLite database or connect to an existing one.
-> .Write your SQL queries in the text box and execute the query by clicking the "Execute" button.
-> .The results will be displayed in the "Output Window" section.
+> Write your SQL queries in the text box and execute the query by clicking the "Execute" button.
+> The results will be displayed in the "Output Window" section.
 
 <h3 align="center">Linting</h3>
 
