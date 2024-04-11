@@ -23,13 +23,13 @@
 > To create the necessary virtual environment in the project directory, run the following command:
 
 ```console
-conda create -n DBScanner python=3.11 pip -y
+conda create -n TableTracker python=3.11 pip -y
 ```
 
 > Activate the created virtual environment:
 
 ```console
-conda activate DBScanner
+conda activate TableTracker
 ```
 
 > To install required modules
@@ -63,7 +63,7 @@ python table_tracker
 > For running <b><i>pylint</i></b>
 
 ```console
-pylint ./db_scanner/ ./test/
+pylint ./table_tracker/ ./test/
 ```
 
 <h3 align="center">Testing</h3>
