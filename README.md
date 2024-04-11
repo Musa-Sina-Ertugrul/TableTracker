@@ -16,7 +16,7 @@
 > TableTracker is a desktop application developed in Python that facilitates tracking and managing SQLite database tables. This application allows you to execute SQL queries on SQLite databases, visualize the results, and edit your queries.
 
 <h3 align="center">Requirements</h3>
-> .Python 3.6 or a newer version
+> Python 3.11 or a newer version
 
 <h3 align="center">Setup</h3>
 
