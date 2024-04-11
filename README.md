@@ -4,7 +4,7 @@
 <img src="https://github.com/Musa-Sina-Ertugrul/DBScanner/assets/102359522/1ea4b501-898f-4b57-8a7e-90e853d50cdd">
 </p>
 
-<h3 align="center"> Our Porpuse</h3>
+<h3 align="center"> Our Purpose</h3>
 
 <p align="center">
 <img src="https://github.com/Musa-Sina-Ertugrul/TableTracker/assets/102359522/cd2e98f0-083e-44f4-a532-e4e9b9a29c47">
