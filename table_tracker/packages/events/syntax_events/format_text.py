@@ -47,14 +47,15 @@ class FormatTextHandler(EventHandler):
         self._root.select_page_menu.set(page_name)
         itr_index: int = int(page_name[-2:].strip()) - 1
         try:
-            self._change_text(self._itrs[itr_index])
-        except IndexError as error:
+            self._handle_tables(itr_index)
+        except TypeError:
+            self._root.set_result_label = "Query executed"
+        except BaseException as error:
             print(error)
             self._root.set_result_label = (
                 f"{self._sql_handler.get_query}\n\n\n\nThis query is wrong"
             )
-        except TypeError:
-            self._root.set_result_label = "Query executed"
+
 
     def _handle_first_call(self) -> None:
 
@@ -62,16 +63,21 @@ class FormatTextHandler(EventHandler):
             itrs: tuple[sqlite3.Cursor] = self._itrs
             self._root._add_page(*[f"Page {i}" for i in range(1, len(itrs) + 1)])
             self._root.select_page_menu.set("Page 1")
-            self._change_text(itrs[0])
+            self._handle_tables(0)
             self._isfirst = False
-        except IndexError as error:
+        except TypeError:
+            self._isfirst = False
+            self._root.set_result_label = "Query executed"
+        except BaseException as error:
             print(error)
             self._root.set_result_label = (
                 f"{self._sql_handler.get_query}\n\n\n\nThis query is wrong"
             )
-        except TypeError:
-            self._isfirst = False
-            self._root.set_result_label = "Query executed"
+
+    def _handle_tables(self,index : int) -> None:
+        self._change_text(self._itrs[index])
+        self._root.sheet.headers([str(col[0]) for col in self._sql_handler._cursor.description])
+        self._root.sheet.data = [[str(atr) for atr in row] for row in iter(self._itrs[index])]
 
     def _change_text(self, itr: sqlite3.Cursor) -> None:
 
