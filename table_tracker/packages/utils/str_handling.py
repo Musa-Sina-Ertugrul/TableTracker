@@ -1,4 +1,3 @@
-
 def strip_triple(text: str) -> str:
     stripped_text: str = text.strip().strip("\t").strip("\n")
     stripped_text: str = text.strip().strip("\n").strip("\t")

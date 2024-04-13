@@ -4,7 +4,7 @@ import sqlite3
 from typing import Any, Generator
 from ..event_handler import EventHandler
 from ..sql_event_handler import SQLEventHandler
-from packages.utils import QUERY_ERROR_NONE_OBJECT,strip_triple
+from packages.utils import QUERY_ERROR_NONE_OBJECT, strip_triple
 
 
 class FormatTextHandler(EventHandler):
@@ -56,7 +56,6 @@ class FormatTextHandler(EventHandler):
                 f"{self._sql_handler.get_query}\n\n\n\nThis query is wrong"
             )
 
-
     def _handle_first_call(self) -> None:
 
         try:
@@ -74,10 +73,14 @@ class FormatTextHandler(EventHandler):
                 f"{self._sql_handler.get_query}\n\n\n\nThis query is wrong"
             )
 
-    def _handle_tables(self,index : int) -> None:
+    def _handle_tables(self, index: int) -> None:
         self._change_text(self._itrs[index])
-        self._root.sheet.headers([str(col[0]) for col in self._sql_handler._cursor.description])
-        self._root.sheet.data = [[str(atr) for atr in row] for row in iter(self._itrs[index])]
+        self._root.sheet.headers(
+            [str(col[0]) for col in self._sql_handler._cursor.description]
+        )
+        self._root.sheet.data = [
+            [str(atr) for atr in row] for row in iter(self._itrs[index])
+        ]
 
     def _change_text(self, itr: sqlite3.Cursor) -> None:
 
@@ -87,5 +90,5 @@ class FormatTextHandler(EventHandler):
         label_text += "\n\n\n"
         for line in self.get_one_line(self._sql_handler.get_query_result_itr):
             label_text += line
-        
+
         self._root.set_result_label = strip_triple(label_text)

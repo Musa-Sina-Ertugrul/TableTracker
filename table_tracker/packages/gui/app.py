@@ -32,7 +32,7 @@ class App(customtkinter.CTk):
         self._main_connection: sqlite3.Connection = None
         self._main_cursor: sqlite3.Cursor = None
         self._format_event: FormatTextHandler = None
-        self._file_path : str = ""
+        self._file_path: str = ""
 
         self.bind("<Control-z>", self.get_older_query)
         self.bind("<Control-Shift-Z>", self.get_new_old_query)
@@ -41,7 +41,7 @@ class App(customtkinter.CTk):
         self.iconbitmap(default="logo.ico")
         self.title("")
         self.geometry(f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}")
-        self.attributes('-fullscreen', True)
+        self.attributes("-fullscreen", True)
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure((2, 3), weight=1)
@@ -177,10 +177,23 @@ class App(customtkinter.CTk):
         self.main_button_1.grid(
             row=4, column=1, columnspan=3, padx=(20, 20), pady=(20, 20), sticky="nsew"
         )
-        self.sheet : Sheet = Sheet(self,theme="light green",height=(self.winfo_screenheight()//2 + self.winfo_screenheight()//5),data=[[]],headers=[],font=("Courier",13,"normal"))
-        self.sheet.grid(sticky="nsew",row=2,rowspan=2,column=1,columnspan=3,
-            padx=(0,20),
-            pady=(20,0),)
+        self.sheet: Sheet = Sheet(
+            self,
+            theme="light green",
+            height=(self.winfo_screenheight() // 2 + self.winfo_screenheight() // 5),
+            data=[[]],
+            headers=[],
+            font=("Courier", 13, "normal"),
+        )
+        self.sheet.grid(
+            sticky="nsew",
+            row=2,
+            rowspan=2,
+            column=1,
+            columnspan=3,
+            padx=(0, 20),
+            pady=(20, 0),
+        )
         # create textbox
         self.textbox = customtkinter.CTkTextbox(
             self,
@@ -189,9 +202,7 @@ class App(customtkinter.CTk):
             font=customtkinter.CTkFont(family="Courier"),
         )
         self.textbox.bind("<Enter>", self._analyze_text)
-        self.textbox.grid(
-            row=1, column=1, padx=(20, 0), pady=(20, 0), sticky="new"
-        )
+        self.textbox.grid(row=1, column=1, padx=(20, 0), pady=(20, 0), sticky="new")
 
         self.output_frame = customtkinter.CTkScrollableFrame(
             self, width=425, orientation=("horizontal", "vertical")
@@ -261,16 +272,16 @@ class App(customtkinter.CTk):
             self._format_event.handle(page_name)
 
     def save_csv(self) -> None:
-        thread : Thread = Thread(target=self._save_csv,daemon=True)
+        thread: Thread = Thread(target=self._save_csv, daemon=True)
         thread.start()
 
     def _save_csv(self) -> None:
         try:
-            file_name_list : list = self._file_path.split("/")
+            file_name_list: list = self._file_path.split("/")
             file_name_list[-1] = "tmp_" + file_name_list[-1]
-            file_name : str = "".join(file_name_list)
+            file_name: str = "".join(file_name_list)
             self._save_json(file_name=f"{file_name}")
-            df : pd.DataFrame = pd.read_json(f"{file_name}.json")
+            df: pd.DataFrame = pd.read_json(f"{file_name}.json")
             df.to_csv(f"{self._file_path}.csv")
             os.remove(f"{file_name}.json")
             self.set_result_label = f"{self._file_path}.csv has been saved"
@@ -278,22 +289,28 @@ class App(customtkinter.CTk):
             self.set_result_label = f"{self._file_path}.csv has not been saved"
 
     def save_json(self) -> None:
-        thread : Thread = Thread(target=self._save_json,daemon=True)
+        thread: Thread = Thread(target=self._save_json, daemon=True)
         thread.start()
 
-    def _save_json(self,file_name : str = False):
+    def _save_json(self, file_name: str = False):
         try:
             file_name = file_name or self._file_path
-            json_dict : dict = {}
-            for i in range(1,999):
+            json_dict: dict = {}
+            for i in range(1, 999):
                 try:
-                    if not bool(self.sheet.get_header_data(c = i)):
+                    if not bool(self.sheet.get_header_data(c=i)):
                         raise AttributeError
-                    json_dict.update({self.sheet.get_header_data(c = i) : self.sheet.get_column_data( c = i)})
+                    json_dict.update(
+                        {
+                            self.sheet.get_header_data(c=i): self.sheet.get_column_data(
+                                c=i
+                            )
+                        }
+                    )
                 except BaseException:
                     break
-            with open(f"{file_name}.json","w") as f:
-                f.write(json.dumps(json_dict,indent="\t"))
+            with open(f"{file_name}.json", "w") as f:
+                f.write(json.dumps(json_dict, indent="\t"))
             self.set_result_label = f"{file_name}.json has been saved"
         except BaseException:
             self.set_result_label = f"{self._file_path}.csv has not been saved"
@@ -307,10 +324,9 @@ class App(customtkinter.CTk):
         return current_query_file
 
     def save_query(self):
-        thread : Thread = Thread(target=self._save_query,daemon=True)
+        thread: Thread = Thread(target=self._save_query, daemon=True)
         thread.start()
 
-    
     def _save_query(self):
         try:
             if sqlite3.complete_statement(self.get_textbox_text):
@@ -359,7 +375,9 @@ class App(customtkinter.CTk):
             self.set_result_label = "As First Drop One File"
             return
         for current_file in files:
-            thread : Thread = Thread(target=self.file_action,args=(current_file,),daemon=True)
+            thread: Thread = Thread(
+                target=self.file_action, args=(current_file,), daemon=True
+            )
             thread.start()
 
     def file_action(self, file_name: str):
@@ -381,7 +399,7 @@ class App(customtkinter.CTk):
             return None
 
     def format_sql_query(self) -> None:
-        thread : Thread = Thread(target=self._format_sql_query,daemon=True)
+        thread: Thread = Thread(target=self._format_sql_query, daemon=True)
         thread.start()
 
     def _format_sql_query(self):
@@ -457,9 +475,9 @@ class App(customtkinter.CTk):
             self.set_result_label = f"Wrong db name : {file_name}"
 
     def create_sql_event(self) -> None:
-        thread : Thread = Thread(target=self._create_sql_event,daemon=True)
+        thread: Thread = Thread(target=self._create_sql_event, daemon=True)
         thread.start()
-    
+
     def _create_sql_event(self):
         if self._main_connection is not None:
             sleep(0.2)
@@ -468,7 +486,7 @@ class App(customtkinter.CTk):
                 f"{self.get_textbox_text}\n\n\n\nThis query is not complete"
             )
             return
-        self._main_connection = sqlite3.connect(self._file_path) 
+        self._main_connection = sqlite3.connect(self._file_path)
         event: SQLEventHandler = SQLEventHandler(
             self.get_textbox_text, self._main_connection.cursor(), self.output_label
         )
