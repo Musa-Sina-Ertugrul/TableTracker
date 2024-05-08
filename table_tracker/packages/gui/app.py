@@ -500,6 +500,44 @@ class App(customtkinter.CTk):
             self._connect_db(file_name=file_name)
             return None
 
+    def _get_correct_path(self, file_path: str):
+        """
+        Adjusts file path according to OS
+
+        :param file_path: file path
+        :type file_path: str
+
+        :return : file path of temporary file
+        :rtype:str
+        """
+        if sys.platform == "linux":
+            deletation_file: str = self.get_dropfile_tempdir() + "/" + file_path
+        elif sys.platform == "win32":
+            deletation_file: str = self.get_dropfile_tempdir() + "\\" + file_path
+        return deletation_file
+
+    @staticmethod
+    def _delete_files(file_paths: list[str], *, sleeping: bool = False):
+        """
+        Deletes temporary files
+
+        :param file_paths: A list of file paths to delete.
+        :type file_paths: list[str]
+        :param sleeping: Whether to sleep between deletion attempts. Defaults to False.
+        :type sleeping: bool
+        :return: None
+        """
+        deleted: bool = True
+        while deleted:
+            try:
+                for _ in map(os.remove, file_paths):
+                    continue
+                deleted = False
+            except (OSError, EOFError):
+                if sleeping:
+                    sleep(0.5)
+        return None
+
     def format_sql_query(self) -> None:
         thread: Thread = Thread(target=self._format_sql_query, daemon=True)
         thread.start()
