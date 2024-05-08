@@ -23,14 +23,13 @@ customtkinter.set_default_color_theme(
 
 
 class App(customtkinter.CTk):
-
     """
     Custom Application Class
     ------------------------
 
     This class represents the main application window and its functionalities.
 
-   
+
     """
 
     def __init__(self):
@@ -341,11 +340,11 @@ class App(customtkinter.CTk):
     def _save_json(self, file_name: str = False):
         """Perform the actual saving of data as a JSON file.
 
-          This method collects data from the sheet and saves it as a JSON file. If no file name is provided, 
-          it uses the default file path.
+        This method collects data from the sheet and saves it as a JSON file. If no file name is provided,
+        it uses the default file path.
 
-          :param file_name: Optional. The name of the JSON file to be saved.
-          :type file_name: str
+        :param file_name: Optional. The name of the JSON file to be saved.
+        :type file_name: str
         """
         try:
             file_name = file_name or self._file_path
@@ -385,16 +384,15 @@ class App(customtkinter.CTk):
         return current_query_file
 
     def save_query(self):
-         
         """
          Save the SQL query as a file.
 
         This method initiates the process of saving the current SQL query as a file. It starts a new thread
         to handle the saving operation asynchronously.
 
-       
+
         """
-         
+
         thread: Thread = Thread(target=self._save_query, daemon=True)
         thread.start()
 
@@ -406,8 +404,8 @@ class App(customtkinter.CTk):
         retrieves the list of files in the current directory, calculates the number of currently saved query
         files, and then saves the query text to a new file with a name based on the count of saved queries.
 
-        
-       """
+
+        """
 
         try:
             if sqlite3.complete_statement(self.get_textbox_text):
@@ -425,16 +423,15 @@ class App(customtkinter.CTk):
             self.set_result_label = f"{current_query_file}.sql has not been saved"
 
     def get_older_query(self, event):
+        """
+         Retrieve the older query.
+         This method retrieves the older query from the history of executed queries. It updates the textbox
+         with the previous query text and decrements the query index. If there are no more older queries,
+         it displays a message indicating that the bottom of the query history has been reached.
+
+        :param event: Event object triggering the method.
 
         """
-        Retrieve the older query.
-        This method retrieves the older query from the history of executed queries. It updates the textbox
-        with the previous query text and decrements the query index. If there are no more older queries,
-        it displays a message indicating that the bottom of the query history has been reached.
-
-       :param event: Event object triggering the method.
-       
-       """
         if SQLEventHandler.query_index > 0:
             self.textbox.delete("0.0", customtkinter.END)
             self.textbox.insert(
@@ -465,7 +462,7 @@ class App(customtkinter.CTk):
 
     def get_info_from_file(self):
         """
-        Get information from selected file(s).  
+        Get information from selected file(s).
         """
         files: str = filedialog.askopenfilenames(defaultextension=".")
         if not bool(files):
@@ -577,10 +574,10 @@ class App(customtkinter.CTk):
 
     def close_connection(self) -> None:
         """
-          Close database connection.
+        Close database connection.
 
-          This method closes the connection to the database, if one exists, and sets a corresponding label.
-          return: None
+        This method closes the connection to the database, if one exists, and sets a corresponding label.
+        return: None
         """
         if self._main_connection is not None:
             self._main_connection.close()

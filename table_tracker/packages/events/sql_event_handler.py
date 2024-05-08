@@ -11,7 +11,7 @@ from ..utils import QUERY_ERROR_NONE_OBJECT
 
 
 class SQLEventHandler(EventHandler):
-    """ Handler for SQL events. """
+    """Handler for SQL events."""
 
     MAX_PAGE_COUNT: int = 10
     queries: list[str] = []
@@ -29,9 +29,9 @@ class SQLEventHandler(EventHandler):
         self, query: str, cursor: sqlite3.Cursor, result_label: customtkinter.CTkLabel
     ) -> None:
         """
-        Initialize the SQLEventHandler instance. 
+        Initialize the SQLEventHandler instance.
         If the singleton query has not been created, it initializes the attributes accordingly.
-        
+
          :param query: The SQL query.
          :type query: str
          :param cursor: The cursor for executing the query.
@@ -52,8 +52,8 @@ class SQLEventHandler(EventHandler):
     @property
     def get_query(self) -> str:
         """
-        Get the SQL query. 
-        
+        Get the SQL query.
+
         :return: The SQL query. otherwise None.
         :rtype: str| None
         """
@@ -64,7 +64,7 @@ class SQLEventHandler(EventHandler):
     @property
     def get_query_result_itr(self) -> sqlite3.Cursor | None:
         """
-            
+
         Get the iterator for executing the SQL query.
 
         :return: Iterator for executing the SQL query. Returns None if there is an error.
@@ -103,7 +103,6 @@ class SQLEventHandler(EventHandler):
 
     @cache
     def __len__(self) -> int:
-
         """
         Get the total number of rows in the result set.
 
@@ -136,7 +135,7 @@ class SQLEventHandler(EventHandler):
 
         :return: Total number of columns in the result set.
         :rtype: int
-      
+
         """
         return self.__col_len
 
@@ -188,6 +187,6 @@ class SQLEventHandler(EventHandler):
 
         :return: Tuple of cursors representing the divided result set.
         :rtype: tuple
-    
+
         """
         return self.divaded_itrs

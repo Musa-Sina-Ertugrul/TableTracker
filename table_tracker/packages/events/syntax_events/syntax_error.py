@@ -78,4 +78,3 @@ class SytanxErrorHandler(EventHandler):
         :rtype: str
         """
         return "syntax_error_tag_name"
-

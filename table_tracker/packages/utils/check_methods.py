@@ -1,5 +1,6 @@
 from typing import Literal
 
+
 def check_methods(subcls, *methods) -> Literal["NotImplemented"] | Literal[True]:
     """
     Check if a subclass implements the specified methods.

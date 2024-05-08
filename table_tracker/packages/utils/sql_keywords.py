@@ -164,7 +164,7 @@ class SQLKeyWords(ABCMeta):
         :param base: The base class.
         :return: A dictionary containing keywords and their colors.
         :rtype: Any | dict
-    
+
         """
         cls_dict: dict = super().__prepare__(mcls, name, base)
         keywords: dict = dict()
@@ -194,6 +194,6 @@ class SQLKeyWords(ABCMeta):
         :param namespace: The namespace containing class attributes.
         :return: A new instance of the class.
         :rtype: Self
-        
+
         """
         return super().__new__(mcls, name, bases, namespace)
