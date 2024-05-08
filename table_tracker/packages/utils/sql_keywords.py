@@ -157,6 +157,15 @@ class SQLKeyWords(ABCMeta):
 
     @classmethod
     def __prepare__(mcls, name, base) -> Any | dict:
+        """
+        Prepare the class dictionary with keywords and their corresponding colors.
+        :param mcls: The metaclass.
+        :param name: The name of the class.
+        :param base: The base class.
+        :return: A dictionary containing keywords and their colors.
+        :rtype: Any | dict
+    
+        """
         cls_dict: dict = super().__prepare__(mcls, name, base)
         keywords: dict = dict()
 
@@ -176,4 +185,15 @@ class SQLKeyWords(ABCMeta):
         return cls_dict
 
     def __new__(mcls, name, bases, namespace) -> Self:
+        """
+        Create a new class instance.
+
+        :param mcls: The metaclass.
+        :param name: The name of the class.
+        :param bases: The base classes.
+        :param namespace: The namespace containing class attributes.
+        :return: A new instance of the class.
+        :rtype: Self
+        
+        """
         return super().__new__(mcls, name, bases, namespace)

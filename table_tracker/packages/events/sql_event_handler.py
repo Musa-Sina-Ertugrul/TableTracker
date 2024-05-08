@@ -11,6 +11,7 @@ from ..utils import QUERY_ERROR_NONE_OBJECT
 
 
 class SQLEventHandler(EventHandler):
+    """ Handler for SQL events. """
 
     MAX_PAGE_COUNT: int = 10
     queries: list[str] = []
@@ -18,11 +19,26 @@ class SQLEventHandler(EventHandler):
 
     @cache
     def __new__(cls, *args, **kwargs) -> Self:
+        """
+        Create a new instance of SQLEventHandler class.
+        Implements the Singleton pattern.
+        """
         return super().__new__(cls)
 
     def __init__(
         self, query: str, cursor: sqlite3.Cursor, result_label: customtkinter.CTkLabel
     ) -> None:
+        """
+        Initialize the SQLEventHandler instance. 
+        If the singleton query has not been created, it initializes the attributes accordingly.
+        
+         :param query: The SQL query.
+         :type query: str
+         :param cursor: The cursor for executing the query.
+         :type cursor: sqlite3.Cursor
+         :param result_label: The label to display the result.
+         :type result_label: customtkinter.CTkLabel
+        """
         if not hasattr(self, "_query"):
             self._query: str = query
             self._cursor: sqlite3.Cursor = cursor
@@ -35,12 +51,26 @@ class SQLEventHandler(EventHandler):
 
     @property
     def get_query(self) -> str:
+        """
+        Get the SQL query. 
+        
+        :return: The SQL query. otherwise None.
+        :rtype: str| None
+        """
         if not sqlite3.complete_statement(self._query):
             return QUERY_ERROR_NONE_OBJECT
         return self._query
 
     @property
     def get_query_result_itr(self) -> sqlite3.Cursor | None:
+        """
+            
+        Get the iterator for executing the SQL query.
+
+        :return: Iterator for executing the SQL query. Returns None if there is an error.
+        :rtype: sqlite3.Cursor or None
+        :raise KeyError: Raised in a specific error condition.
+        """
         try:
             return self._cursor.execute(self.get_query)
         except (sqlite3.ProgrammingError, AttributeError) as error:
@@ -49,15 +79,41 @@ class SQLEventHandler(EventHandler):
 
     @staticmethod
     def _sizeof_row(row: list[tuple]) -> int:
+        """
+        Calculate the size of a row in bytes.
+
+        :param row: List of tuples representing a row.
+        :type row: list[tuple]
+        :return: Size of the row in bytes.
+        :rtype: int
+        """
         return reduce(getsizeof, [str(atr) for atr in row])
 
     @property
     def row_len(self) -> int:
+        """
+        Get the length of the rows.
+
+        If the row length attribute is not set, it returns the length calculated from the result set.
+
+        :return: Length of the rows.
+        :rtype: int
+        """
         return self.__row_len or len(self)
 
     @cache
     def __len__(self) -> int:
 
+        """
+        Get the total number of rows in the result set.
+
+        This method iterates through the result set obtained from the query execution and counts the rows. It also
+        calculates the total size of the result set.
+
+        :return: Total number of rows in the result set.
+        :rtype: int
+        :raise KeyError: Raised in a specific error condition.
+        """
         try:
             row_itr: sqlite3.Cursor = self.get_query_result_itr
             row: list[tuple] = next(row_itr)
@@ -73,10 +129,29 @@ class SQLEventHandler(EventHandler):
     @property
     @cache
     def col_len(self) -> int:
+        """
+        Get the total number of columns in the result set.
+
+        This method returns the number of columns in the result set.
+
+        :return: Total number of columns in the result set.
+        :rtype: int
+      
+        """
         return self.__col_len
 
     @property
     def divaded_itrs(self) -> tuple[sqlite3.Cursor]:
+        """
+        Divide the result set into multiple cursors.
+
+        This method divides the result set into multiple cursors based on the available memory and the size of the result set.
+        It calculates the number of pages and rows per page, then creates cursors accordingly.
+
+        :return: Tuple of cursors representing the divided result set.
+        :rtype: tuple[sqlite3.Cursor]
+        :raise KeyError: Raised in a specific error condition.
+        """
         len(self)
         avaible_memory: int = int(virtual_memory()[1])
 
@@ -106,4 +181,13 @@ class SQLEventHandler(EventHandler):
         return itrs
 
     def handle(self) -> tuple[sqlite3.Cursor]:
+        """
+        Handle the SQL query result.
+
+        This method retrieves the divided iterators of the SQL query result using the `divaded_itrs` method and returns them.
+
+        :return: Tuple of cursors representing the divided result set.
+        :rtype: tuple
+    
+        """
         return self.divaded_itrs
