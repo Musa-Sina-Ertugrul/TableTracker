@@ -49,7 +49,6 @@ class App(customtkinter.CTk):
         self.bind("<Control-Shift-Z>", self.get_new_old_query)
 
         # configure window
-        self.iconbitmap(default="logo.ico")
         self.title("")
         self.geometry(f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}")
         self.attributes("-fullscreen", True)
@@ -81,13 +80,6 @@ class App(customtkinter.CTk):
             font=customtkinter.CTkFont(family="Courier"),
         )
         self.sidebar_button_1.grid(row=2, column=0, padx=20, pady=10)
-        self.sidebar_button_2 = customtkinter.CTkButton(
-            self.sidebar_frame,
-            text="Table Names",
-            command=self.get_table_names,
-            font=customtkinter.CTkFont(family="Courier"),
-        )
-        self.sidebar_button_2.grid(row=3, column=0, padx=20, pady=10)
         self.sidebar_button_3 = customtkinter.CTkButton(
             self.sidebar_frame,
             text="Formatting",

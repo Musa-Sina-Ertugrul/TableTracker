@@ -56,7 +56,7 @@ class FormatTextHandler(EventHandler):
                 max_len = max(len(str(column[0])), max_len)
             for line in self._sql_handler.get_query_result_itr:
                 for attr in line:
-                    max_len = max(max_len, len(str(atrr)))
+                    max_len = max(max_len, len(str(attr)))
         return max_len + 10
 
     def get_one_line(self, itr: Iterator) -> Generator[str, Any, None]:
